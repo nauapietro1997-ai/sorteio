@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sorteio GTA 6 — Nauã Pietro</title>
+    <meta
+      name="description"
+      content="Sorteio gratuito de um GTA 6 lacrado (PS5) da live do Nauã Pietro. Veja como ganhar números, a lista de participantes e o resultado pela Mega da Virada."
+    />
+    <meta name="theme-color" content="#12072a" />
+    <link rel="icon" href="data:," />
+    <meta property="og:title" content="Sorteio GTA 6 — Nauã Pietro" />
+    <meta
+      property="og:description"
+      content="Participação grátis. Sorteio em 31/12/2026 pelo resultado da Mega da Virada."
+    />
+    <meta property="og:type" content="website" />
+    <link
+      rel="preload"
+      href="fontes/anton-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="fontes/montserrat-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="estilo.css" />
+  </head>
+  <body>
+    <a class="pular" href="#participantes"
+      >Pular para a lista de participantes</a
+    >
+
+    <header class="topo">
+      <div class="topo-conteudo">
+        <h1 class="titulo">
+          <span class="titulo-a">Sorteio</span>
+          <span class="titulo-b">GTA 6</span>
+          <span class="titulo-c"
+            ><span aria-hidden="true">— </span>Nauã Pietro</span
+          >
+        </h1>
+
+        <p class="fatos">
+          <span class="fato"
+            ><span class="fato-rotulo">Prêmio:</span>
+            <strong data-campo="premio">GTA 6 lacrado (PS5)</strong></span
+          >
+          <span class="fato-sep fato-sep-1" aria-hidden="true">·</span>
+          <span class="fato"
+            ><span class="fato-rotulo">Sorteio:</span>
+            <strong data-campo="data-sorteio">31/12</strong></span
+          >
+          <span class="fato-sep" aria-hidden="true">·</span>
+          <span class="fato"><strong>Grátis</strong></span>
+        </p>
+      </div>
+    </header>
+
+    <main class="conteudo">
+      <p class="aviso" id="aviso" role="status" hidden></p>
+
+      <!-- Aparece só quando o JSON tiver "sorteio" preenchido -->
+      <section
+        class="bloco resultado"
+        id="resultado"
+        aria-labelledby="resultado-titulo"
+        hidden
+      >
+        <h2 id="resultado-titulo">Resultado do sorteio</h2>
+        <p class="resultado-fonte" id="resultado-fonte"></p>
+
+        <div class="resultado-grade">
+          <div class="resultado-passo">
+            <h3>Dezenas sorteadas</h3>
+            <ol class="dezenas" id="resultado-dezenas"></ol>
+          </div>
+          <div class="resultado-passo">
+            <h3>A conta</h3>
+            <p class="conta" id="resultado-conta"></p>
+          </div>
+        </div>
+
+        <div class="vencedor">
+          <p class="vencedor-numero">
+            <span class="rotulo">Número vencedor</span>
+            <span class="vencedor-valor" id="resultado-numero"></span>
+          </p>
+          <p class="vencedor-nome">
+            <span class="rotulo">Vencedor</span>
+            <span class="vencedor-apelido" id="resultado-vencedor"></span>
+          </p>
+          <p class="vencedor-premio">
+            <span class="rotulo">Prêmio</span>
+            <span class="vencedor-premio-valor" id="resultado-premio"></span>
+          </p>
+          <p class="selo" id="resultado-status"></p>
+        </div>
+        <p class="nota" id="resultado-nota" hidden></p>
+      </section>
+
+      <div class="colunas">
+        <div class="coluna-principal">
+          <section class="bloco meta" aria-labelledby="meta-titulo">
+            <div class="meta-cabeca">
+              <h2 id="meta-titulo">Meta da Comunidade</h2>
+              <p class="meta-pct">
+                <span id="meta-valor">0</span
+                ><span class="meta-simbolo">%</span>
+              </p>
+            </div>
+            <div
+              class="meta-trilho"
+              role="progressbar"
+              aria-labelledby="meta-titulo"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+              id="meta-barra"
+            >
+              <div class="meta-preenchido" id="meta-preenchido"></div>
+            </div>
+            <p class="meta-texto">
+              Bateu 100%? Sorteamos o <strong>GTA 6</strong>. Não bateu?
+              Sorteamos um <strong>gift card de R$&nbsp;100</strong>.
+            </p>
+          </section>
+
+          <section class="bloco como" aria-labelledby="como-titulo">
+            <h2 id="como-titulo">Como participar</h2>
+            <ol class="passos">
+              <li class="passo">
+                <p class="passo-valor"><span>1</span> número</p>
+                <p class="passo-texto">
+                  Siga o Nauã no
+                  <strong>TikTok, Instagram, YouTube e Kick</strong> e digite
+                  <kbd>!sorteio</kbd> na live
+                </p>
+              </li>
+              <li class="passo">
+                <p class="passo-valor"><span>+1</span> número</p>
+                <p class="passo-texto">
+                  Compartilhe a live do <strong>TikTok</strong>
+                </p>
+              </li>
+              <li class="passo">
+                <p class="passo-valor"><span>+1</span> número</p>
+                <p class="passo-texto">
+                  Mande um presente <strong>ou</strong> converse no chat em 3
+                  lives diferentes
+                </p>
+              </li>
+            </ol>
+            <p class="como-regra">
+              Máximo <strong>3 números por pessoa</strong>. Participar é
+              <strong>grátis</strong>.
+            </p>
+          </section>
+        </div>
+
+        <aside class="bloco top" aria-labelledby="top-titulo">
+          <h2 id="top-titulo">Top Apoiadores</h2>
+          <ol class="top-lista" id="top-lista"></ol>
+          <p class="top-vazio" id="top-vazio" hidden>
+            O ranking aparece aqui quando começar.
+          </p>
+          <p class="nota">
+            Quem mais apoiar ganha um presente de agradecimento.
+          </p>
+        </aside>
+      </div>
+
+      <section
+        class="bloco participantes"
+        id="participantes"
+        aria-labelledby="part-titulo"
+        tabindex="-1"
+      >
+        <div class="part-cabeca">
+          <h2 id="part-titulo">Participantes</h2>
+          <p class="part-resumo" id="part-resumo"></p>
+        </div>
+
+        <div class="busca">
+          <label for="busca-campo">Ache seu nome</label>
+          <input
+            type="search"
+            id="busca-campo"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Ex.: vicecity_ana ou 12"
+            enterkeyhint="search"
+          />
+        </div>
+        <p
+          class="busca-resultado"
+          id="busca-resultado"
+          role="status"
+          aria-live="polite"
+        ></p>
+
+        <ul class="lista" id="lista"></ul>
+        <button type="button" class="ver-todos" id="ver-todos" hidden></button>
+        <p class="lista-vazia" id="lista-vazia" hidden></p>
+      </section>
+
+      <section class="bloco regulamento" aria-labelledby="reg-titulo">
+        <h2 id="reg-titulo" class="visualmente-oculto">Regulamento</h2>
+        <details>
+          <summary><span>Regulamento</span></summary>
+          <div class="reg-texto">
+            <h3>Participação</h3>
+            <ul>
+              <li>
+                Participar é <strong>grátis</strong>. Presente não é
+                obrigatório.
+              </li>
+              <li>Máximo <strong>3 números</strong> por pessoa.</li>
+              <li>Cada jeito de ganhar vale 1 vez.</li>
+              <li>Os números saem em ordem de chegada: 1, 2, 3…</li>
+              <li>Vale de 19/11 a 31/12/2026.</li>
+            </ul>
+
+            <h3>Como sai o ganhador</h3>
+            <p>
+              Usamos as dezenas da <strong>Mega da Virada de 31/12</strong>. Uma
+              conta transforma essas dezenas no número ganhador — ninguém
+              consegue escolher.
+            </p>
+            <details class="ver-conta">
+              <summary>Ver a conta</summary>
+              <div class="ver-conta-texto">
+                <ol>
+                  <li>
+                    Coloca as 6 dezenas em ordem crescente, com 2 dígitos cada.
+                  </li>
+                  <li>Junta tudo num número só.</li>
+                  <li>
+                    Divide pelo total de números e pega o
+                    <strong>resto</strong>.
+                  </li>
+                  <li>Resto + 1 = número ganhador.</li>
+                </ol>
+                <div class="exemplo">
+                  <p class="exemplo-titulo">Exemplo (números inventados)</p>
+                  <p>Dezenas: <span class="num">05 09 13 25 44 60</span></p>
+                  <p>Juntando: <span class="num">050913254460</span></p>
+                  <p>Total de números: <span class="num">87</span></p>
+                  <p>050913254460 ÷ 87 → resto <span class="num">33</span></p>
+                  <p>33 + 1 = <span class="num destaque">Nº 34</span></p>
+                </div>
+              </div>
+            </details>
+
+            <h3>Para levar o prêmio</h3>
+            <ul>
+              <li>
+                Precisa seguir o Nauã nas <strong>4 redes</strong>. Senão, vale
+                o próximo número.
+              </li>
+              <li>
+                Responda em até <strong>7 dias</strong>. Senão, vale o próximo
+                número.
+              </li>
+            </ul>
+
+            <h3>Prêmio</h3>
+            <ul>
+              <li>Meta bateu 100%: <strong>GTA 6 lacrado (PS5)</strong>.</li>
+              <li>
+                Meta não bateu:
+                <strong>gift card de R$&nbsp;100</strong> (digital).
+              </li>
+              <li>
+                Meta não bateu? O valor juntado continua para o próximo sorteio
+                (descontado o gift card).
+              </li>
+              <li>Frete do GTA 6: metade é do Nauã, metade de quem ganhar.</li>
+            </ul>
+
+            <h3>Dúvidas</h3>
+            <p>
+              Chama no Discord:
+              <a href="https://discord.gg/bYYxxFY6F3" rel="noopener"
+                >discord.gg/bYYxxFY6F3</a
+              >
+            </p>
+
+            <p class="isencao">
+              Esta promoção não é patrocinada, administrada ou associada ao
+              TikTok, YouTube, Kick ou Instagram.
+            </p>
+          </div>
+        </details>
+      </section>
+    </main>
+
+    <footer class="rodape">
+      <p>
+        Dúvidas? Fale com a gente no
+        <a href="https://discord.gg/bYYxxFY6F3" rel="noopener"
+          >Discord da live</a
+        >.
+      </p>
+      <p class="rodape-atualizado" id="atualizado">Carregando dados…</p>
+      <p class="rodape-isencao">
+        Esta promoção não é patrocinada, administrada ou associada ao TikTok,
+        YouTube, Kick ou Instagram.
+      </p>
+    </footer>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
