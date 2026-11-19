@@ -1,6 +1,8 @@
 /* Sorteio GTA 6 — Nauã Pietro
-   Mesmas fontes e cores do overlay da live (overlay/np.css e overlay/novo/novo.css).
-   Só layout, texto e animação: nenhuma arte desenhada aqui. */
+   Extensão do overlay da live: mesmas fontes, cores e peças (painel, barra e moldura
+   geradas, usadas como border-image igual ao overlay/novo/novo.css).
+   Aqui só tem layout, texto e animação: nenhuma arte desenhada em CSS. */
+
 
 @font-face {
   font-family: "Anton";
@@ -82,35 +84,37 @@
   font-display: swap;
   src: url("fontes/barlow-sc-800.woff2") format("woff2");
 }
-
+/* ================= TOKENS (mesmos do overlay: np.css + novo/novo.css) ================= */
 :root {
   color-scheme: dark;
-
-  /* cores da live */
   --noite: #12072a;
-  --noite-2: #1c0b3b;
-  --noite-3: #29124f;
-  --roxo: #8a2be2;
+  --fundo: #0d0518;
   --rosa: #ff2e88;
+  --rosa-claro: #ffd3ea;
+  --magenta: #c13cff;
   --laranja: #ff8a3c;
-  --sol: #ffb347;
-  --ouro: #ffd36a;
   --ciano: #31e7ff;
+  --ouro: #ffd36a;
   --texto: #fff6fb;
-  --suave: #d9c4e6; /* texto secundário, puxado do roxo (contraste > 9:1 na noite) */
-  --apagado: #a98fc0; /* rótulos pequenos (contraste > 5:1 na noite) */
-  --linha: rgba(255, 246, 251, 0.12);
+  --suave: rgba(255, 246, 251, 0.72);
+  --linha: rgba(255, 255, 255, 0.14);
 
-  /* fontes */
-  --f-titulo: "Anton", sans-serif;
-  --f-nome: "Rubik", "Montserrat", sans-serif;
-  --f-texto: "Montserrat", sans-serif;
+  --neon: linear-gradient(90deg, var(--rosa), var(--magenta) 55%, var(--ciano));
+  --por-do-sol: linear-gradient(
+    180deg,
+    #4a1680 0%,
+    var(--rosa) 55%,
+    var(--laranja) 100%
+  );
+
+  --f-titulo: "Anton", "Impact", sans-serif;
+  --f-texto: "Montserrat", system-ui, sans-serif;
+  --f-nome: "Rubik", "Arial Black", sans-serif;
   --f-num: "Barlow Semi Condensed", "Montserrat", sans-serif;
 
-  --entra: cubic-bezier(0.16, 1, 0.3, 1);
-  --raio: 14px;
-  --largura: 1160px;
-  --margem: clamp(16px, 4vw, 40px);
+  /* curva de entrada do overlay (--k-entra) */
+  --entra: cubic-bezier(0.2, 1, 0.3, 1);
+  --raio-card: 14px;
 }
 
 *,
@@ -126,419 +130,434 @@ html {
 
 body {
   margin: 0;
-  background: var(--noite);
+  min-height: 100vh;
+  background: var(--fundo);
   color: var(--texto);
-  font-family: var(--f-texto);
-  font-weight: 500;
-  font-size: 1rem;
-  line-height: 1.55;
+  font: 500 16px/1.55 var(--f-texto);
   overflow-x: hidden;
-  caret-color: var(--laranja);
-  accent-color: var(--rosa);
 }
 
-::selection {
-  background: var(--rosa);
-  color: var(--noite);
+/* Fundo da live (fundo-h do overlay), escurecido e parado atrás de tudo */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(13, 5, 24, 0.86), rgba(13, 5, 24, 0.93)),
+    url("assets/fundo-h.webp") center / cover no-repeat;
 }
 
-html {
-  scrollbar-color: var(--roxo) var(--noite);
+img {
+  max-width: 100%;
+  display: block;
 }
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: var(--noite);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--roxo);
-  border-radius: 10px;
-  border: 2px solid var(--noite);
+
+a {
+  color: var(--rosa-claro);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
 }
 
 :focus-visible {
   outline: 3px solid var(--ciano);
   outline-offset: 3px;
-  border-radius: 6px;
-}
-
-a {
-  color: var(--sol);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.2em;
-}
-a:hover {
-  color: var(--ouro);
 }
 
 strong {
   font-weight: 800;
-  color: var(--texto);
-}
-
-h1,
-h2,
-h3,
-p,
-ol,
-ul,
-dl,
-dd {
-  margin: 0;
 }
 
 .visualmente-oculto {
-  position: absolute;
+  position: absolute !important;
   width: 1px;
   height: 1px;
+  padding: 0;
+  margin: -1px;
   overflow: hidden;
   clip: rect(0 0 0 0);
-  clip-path: inset(50%);
   white-space: nowrap;
+  border: 0;
 }
 
 .pular {
   position: absolute;
-  left: var(--margem);
-  top: -100px;
+  left: 12px;
+  top: -60px;
   z-index: 10;
-  background: var(--sol);
-  color: var(--noite);
-  font-weight: 800;
   padding: 10px 16px;
-  border-radius: 10px;
-  text-decoration: none;
+  background: var(--noite);
+  color: var(--texto);
+  font-weight: 800;
+  border-radius: 999px;
 }
 .pular:focus {
   top: 12px;
 }
 
-/* ---------- Topo (pôster) ---------- */
-.topo {
-  /* Degradê de reserva (aparece se a capa não carregar). A capa entra no fim do arquivo. */
-  background: linear-gradient(
-    180deg,
-    var(--noite) 0%,
-    #2a0d4f 30%,
-    #4e1262 55%,
-    #7a1868 76%,
-    #b5246b 88%,
-    #e8475f 95%,
-    var(--laranja) 100%
-  );
-  padding: clamp(40px, 9vw, 96px) 0 clamp(72px, 12vw, 140px);
+/* ================= PEÇAS DO KIT DO OVERLAY (border-image das artes geradas) ================= */
+/* Placa de vidro escuro com aro neon */
+.k-painel {
+  border: 22px solid transparent;
+  border-image: url("assets/painel.webp") 48 fill stretch;
+  filter: drop-shadow(0 0 7px rgba(255, 46, 136, 0.35))
+    drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
 }
 
-.topo-conteudo {
-  max-width: var(--largura);
-  margin: 0 auto;
-  padding: 0 var(--margem);
+/* Barra inclinada (redes, meta, avisos) */
+.k-barra {
+  border-style: solid;
+  border-color: transparent;
+  border-width: 11px 38px;
+  border-image: url("assets/barra.webp") 31 108 fill stretch;
+  filter: drop-shadow(0 0 6px rgba(255, 46, 136, 0.35))
+    drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
 }
 
-.titulo {
-  font-family: var(--f-titulo);
-  font-weight: 400;
-  text-transform: uppercase;
-  line-height: 0.86;
-  letter-spacing: 0.005em;
-  display: grid;
-}
-.titulo-a,
-.titulo-b {
-  font-size: clamp(4.25rem, 20vw, 6rem);
-}
-.titulo-a {
-  color: var(--texto);
-}
-.titulo-b {
-  color: var(--sol);
-  text-shadow: 0 6px 18px rgba(18, 7, 42, 0.55);
-}
-.titulo-c {
-  font-family: var(--f-nome);
-  font-weight: 900;
-  text-transform: none;
-  font-size: clamp(1.25rem, 5vw, 1.75rem);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  margin-top: 0.7em;
-  color: var(--texto);
+/* Moldura neon (tubo rosa + laranja) — só no resultado */
+.k-moldura {
+  border: 26px solid transparent;
+  border-image: url("assets/moldura-fina.webp") 50 52 50 52 stretch;
+  background: rgba(18, 7, 42, 0.9);
+  background-clip: padding-box;
+  filter: drop-shadow(0 0 9px rgba(255, 46, 136, 0.45))
+    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.55));
 }
 
-/* entrada única do título: sobe do lugar, já visível */
-@media (prefers-reduced-motion: no-preference) {
-  .titulo > span {
-    animation: subir 0.9s var(--entra) both;
-  }
-  .titulo-b {
-    animation-delay: 0.08s !important;
-  }
-  .titulo-c {
-    animation-delay: 0.16s !important;
-  }
-}
-@keyframes subir {
-  from {
-    transform: translateY(14px);
-    opacity: 0.35;
-  }
-  to {
-    transform: none;
-    opacity: 1;
-  }
-}
-
-.fatos {
-  margin-top: clamp(24px, 5vw, 40px);
+/* Título de seção: Anton inclinado, igual aos títulos do overlay */
+.sec-titulo {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 12px;
-  font-size: clamp(1.0625rem, 3.6vw, 1.25rem);
-  line-height: 1.35;
-  color: var(--texto);
-}
-.fato {
-  white-space: nowrap;
-}
-.fato-rotulo {
-  font-weight: 600;
-  color: #ffe3f2;
-}
-.fato strong {
-  font-weight: 900;
-}
-.fato-sep {
-  color: var(--sol);
-  font-weight: 900;
-}
-
-/* ---------- Conteúdo ---------- */
-.conteudo {
-  max-width: var(--largura);
-  margin: calc(-1 * clamp(40px, 7vw, 80px)) auto 0;
-  padding: 0 var(--margem);
-  display: grid;
-  gap: clamp(20px, 3vw, 32px);
-}
-
-.bloco {
-  background: var(--noite-2);
-  border: 1px solid var(--linha);
-  border-radius: var(--raio);
-  padding: clamp(20px, 4vw, 36px);
-  box-shadow: 0 18px 40px -18px rgba(5, 0, 18, 0.7);
-  min-width: 0;
-}
-
-.bloco h2 {
-  font-family: var(--f-titulo);
-  font-weight: 400;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font: 400 clamp(26px, 6.4vw, 34px) / 1 var(--f-titulo);
   text-transform: uppercase;
-  font-size: clamp(1.75rem, 6vw, 2.5rem);
-  line-height: 1;
   letter-spacing: 0.01em;
-  text-wrap: balance;
+  color: var(--texto);
+  transform: skewX(-6deg);
+  transform-origin: left center;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+}
+.sec-ico {
+  width: 34px;
+  height: 34px;
+  flex: none;
 }
 
 .nota {
+  margin: 14px 0 0;
+  font-size: 14px;
   color: var(--suave);
-  font-size: 0.9375rem;
-}
-
-.aviso {
-  background: #3b1240;
-  border: 1px solid #8c2b63;
-  color: #ffe0ef;
-  border-radius: 12px;
-  padding: 12px 16px;
-  font-size: 0.9375rem;
-}
-
-.colunas {
-  display: grid;
-  gap: clamp(20px, 3vw, 32px);
-}
-.coluna-principal {
-  display: grid;
-  gap: clamp(20px, 3vw, 32px);
-  min-width: 0;
-}
-@media (min-width: 960px) {
-  .colunas {
-    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
-    align-items: start;
-  }
-  .top {
-    position: sticky;
-    top: 24px;
-  }
-}
-
-/* ---------- Meta ---------- */
-.meta-cabeca {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.meta-pct {
-  font-family: var(--f-num);
-  font-weight: 800;
-  font-size: clamp(3rem, 12vw, 4.5rem);
-  line-height: 0.9;
-  color: var(--sol);
-  font-variant-numeric: tabular-nums;
-}
-.meta-simbolo {
-  font-size: 0.55em;
-  margin-left: 2px;
-  color: var(--laranja);
-}
-
-.meta-trilho {
-  margin-top: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: var(--noite);
-  border: 1px solid var(--linha);
-  overflow: hidden;
-}
-.meta-preenchido {
-  height: 100%;
-  width: 100%;
-  border-radius: inherit;
-  background: linear-gradient(
-    90deg,
-    var(--roxo),
-    var(--rosa) 55%,
-    var(--laranja)
-  );
-  transform-origin: left center;
-  transform: scaleX(var(--meta, 0));
-}
-@media (prefers-reduced-motion: no-preference) {
-  .meta-preenchido {
-    transition: transform 1.4s var(--entra);
-  }
-}
-.meta-texto {
-  margin-top: 16px;
-  color: var(--suave);
-  max-width: 60ch;
-}
-
-/* ---------- Como ganhar ---------- */
-.como-regra {
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--linha);
-  color: var(--suave);
-}
-.passos {
-  list-style: none;
-  padding: 0;
-  margin-top: 22px;
-  display: grid;
-  gap: 0;
-}
-.passo {
-  display: grid;
-  grid-template-columns: 6.5rem 1fr;
-  gap: 16px;
-  padding: 16px 0;
-  border-top: 1px solid var(--linha);
-  align-items: baseline;
-}
-.passo:last-child {
-  padding-bottom: 0;
-}
-.passo-valor {
-  font-family: var(--f-num);
-  font-weight: 700;
-  font-size: 0.9375rem;
-  color: var(--apagado);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  line-height: 1;
-  white-space: nowrap;
-}
-.passo-valor span {
-  display: inline-block;
-  font-weight: 800;
-  font-size: 2.25rem;
-  color: var(--rosa);
-  letter-spacing: 0;
-  margin-right: 4px;
-  min-width: 1.6ch;
-}
-.passo-texto {
-  color: var(--suave);
-  max-width: 62ch;
 }
 
 kbd {
-  font-family: var(--f-num);
-  font-weight: 800;
-  font-size: 1.05em;
-  background: var(--noite);
-  color: var(--ciano);
-  border: 1px solid #3c2a63;
-  border-radius: 6px;
-  padding: 1px 7px;
+  display: inline-block;
+  padding: 0 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 46, 136, 0.6);
+  background: rgba(255, 46, 136, 0.16);
+  font: 800 0.95em / 1.5 var(--f-num);
+  letter-spacing: 0.02em;
+  color: var(--texto);
   white-space: nowrap;
 }
 
-/* ---------- Top apoiadores ---------- */
-.top-lista {
-  list-style: none;
-  padding: 0;
-  margin: 18px 0 16px;
-  display: grid;
+/* ================= TOPO ================= */
+.topo {
+  position: relative;
+  container-type: inline-size;
+  isolation: isolate;
+  overflow: hidden;
 }
-.top-item {
-  display: grid;
-  grid-template-columns: 2.6rem 1fr;
+
+.topo-capa {
+  /* largura da capa no celular: a caixa do GTA fica no centro da tela */
+  --cw: min(202cqw, 1180px);
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: calc(var(--cw) / 1.792);
+  overflow: hidden;
+  z-index: -1;
+  -webkit-mask-image: linear-gradient(180deg, #000 80%, transparent);
+  mask-image: linear-gradient(180deg, #000 80%, transparent);
+}
+.capa-par {
+  position: absolute;
+  inset: 0;
+}
+.capa-img {
+  position: absolute;
+  top: 0;
+  left: calc(50cqw - var(--cw) * 0.75);
+  width: var(--cw);
+  height: 100%;
+  background: url("assets/capa.webp") center / cover no-repeat;
+}
+
+.topo-conteudo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--linha);
+  padding: 14px 16px 28px;
+  text-align: center;
 }
-.top-pos {
-  font-family: var(--f-num);
+
+.logo {
+  width: 132px;
+  height: auto;
+  filter: drop-shadow(0 0 16px rgba(255, 46, 136, 0.7))
+    drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6));
+}
+
+.titulo {
+  margin: calc(min(202cqw, 1180px) * 0.5 - 150px) 0 0;
+  font-family: var(--f-titulo);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 0.9;
+  color: var(--texto);
+  text-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.75),
+    0 0 30px rgba(255, 255, 255, 0.12);
+}
+.titulo .t1,
+.titulo .t2 {
+  display: block;
+  transform: skewX(-6deg);
+}
+.titulo .t1 {
+  font-size: clamp(30px, 9cqw, 44px);
+  letter-spacing: 0.06em;
+}
+.titulo .t2 {
+  font-size: clamp(76px, 24cqw, 120px);
+}
+
+/* Linha de fatos (dentro da barra inclinada) */
+.fatos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px 18px;
+  width: min(100%, 520px);
+  margin: 18px 0 0;
+  padding: 6px 4px;
+  line-height: 1.25;
+}
+.fato {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+.fato-rotulo {
+  font: 700 11px / 1.3 var(--f-num);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rosa-claro);
+}
+.fato strong {
+  font-size: 15px;
   font-weight: 800;
-  font-size: 1.5rem;
-  color: var(--apagado);
+}
+.fato-gratis strong {
+  font: 800 20px / 1 var(--f-num);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ciano);
+}
+
+/* Meta da Comunidade: mesma barra da cena da live */
+.meta {
+  width: min(100%, 520px);
+  margin: 14px 0 0;
+  padding: 8px 4px 10px;
+  text-align: left;
+}
+.m-linha {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.m-titulo {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font: 800 15px / 1.2 var(--f-texto);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.m-valor {
+  margin: 0;
+  font: 800 24px / 1 var(--f-num);
+  color: var(--ciano);
+  white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
-.top-nome {
-  font-family: var(--f-nome);
-  font-weight: 800;
-  font-size: 1.0625rem;
-  overflow-wrap: anywhere;
-  min-width: 0;
+.m-trilho {
+  margin-top: 7px;
+  height: 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
 }
-.top-item.primeiro {
-  padding: 14px 0 16px;
+.m-cheio {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--rosa), var(--laranja));
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 1.6s var(--entra);
 }
-.top-item.primeiro .top-pos {
+.meta.feito .m-cheio {
+  background: linear-gradient(90deg, var(--ouro), #fff3c8);
+}
+.meta.feito .m-valor {
   color: var(--ouro);
-  font-size: 2.5rem;
 }
-.top-item.primeiro .top-nome {
-  font-size: 1.5rem;
-  font-weight: 900;
-  color: var(--ouro);
-}
-.top-item.podio .top-pos {
-  color: var(--sol);
-}
-.top-vazio {
-  margin: 18px 0 12px;
+
+.meta-texto {
+  max-width: 34ch;
+  margin: 12px 0 0;
+  font-size: 15px;
   color: var(--suave);
+}
+.meta-texto strong {
+  color: var(--texto);
+}
+
+/* ================= CONTEÚDO ================= */
+.conteudo {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  padding: 8px 12px 24px;
+}
+
+.aviso {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: var(--raio-card);
+  border: 1px solid rgba(255, 138, 60, 0.6);
+  background: rgba(255, 138, 60, 0.12);
+  font-weight: 700;
+}
+
+.grade {
+  display: grid;
+  gap: 18px;
+}
+.grade > * {
+  min-width: 0;
+  margin: 0;
+}
+.k-painel {
+  padding: 8px 6px 10px;
+}
+
+/* ---------- Como participar ---------- */
+.passos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.passo {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  column-gap: 14px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: var(--raio-card);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--linha);
+}
+.passo-ico {
+  grid-row: span 2;
+  width: 56px;
+  height: 56px;
+}
+.passo-valor {
+  margin: 0;
+  font: 800 13px / 1.2 var(--f-num);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rosa-claro);
+}
+.passo-valor b {
+  font-size: 26px;
+  letter-spacing: 0;
+  color: var(--ciano);
+  margin-right: 4px;
+}
+.passo-texto {
+  margin: 2px 0 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+.como-regra {
+  margin: 14px 2px 0;
+  font-size: 15px;
+  color: var(--suave);
+}
+.como-regra strong {
+  color: var(--texto);
+}
+
+/* ---------- Siga o Nauã ---------- */
+.redes-sub {
+  margin: -6px 0 14px;
+  font-size: 14px;
+  color: var(--suave);
+}
+.redes-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.rede {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 4px 2px;
+  color: var(--texto);
+  text-decoration: none;
+  transition: transform 160ms ease-out;
+}
+.rede:active {
+  transform: scale(0.97);
+}
+.rede-ico {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  object-fit: contain;
+}
+.rede-ico.branco {
+  filter: invert(1);
+}
+.rede-tag {
+  font: 800 12px / 1 var(--f-num);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--rosa-claro);
+  width: 7.2em;
+  flex: none;
+}
+.rede-arroba {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 800 18px / 1.2 var(--f-texto);
+}
+.rede-discord .rede-arroba {
+  font-size: 16px;
 }
 
 /* ---------- Participantes ---------- */
@@ -547,384 +566,957 @@ kbd {
 }
 .part-cabeca {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 8px 20px;
-  flex-wrap: wrap;
+  gap: 0 16px;
 }
 .part-resumo {
+  margin: 0 0 14px;
+  font-size: 14px;
   color: var(--suave);
-  font-size: 0.9375rem;
 }
 .part-resumo strong {
-  font-family: var(--f-num);
-  font-size: 1.2em;
-  color: var(--sol);
+  font: 800 18px var(--f-num);
+  color: var(--ciano);
 }
 
-.busca {
-  margin-top: 20px;
-  display: grid;
-  gap: 8px;
-  max-width: 520px;
-}
 .busca label {
+  display: block;
+  margin-bottom: 6px;
   font-weight: 800;
-  font-size: 0.9375rem;
 }
 .busca input {
-  font: inherit;
-  font-weight: 600;
-  font-size: 1.0625rem;
-  color: var(--texto);
-  background: var(--noite);
-  border: 1px solid #4a3275;
-  border-radius: 12px;
-  padding: 13px 16px;
-  min-height: 50px;
   width: 100%;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  min-height: 50px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 46, 136, 0.45);
+  background: rgba(13, 5, 24, 0.85);
+  color: var(--texto);
+  font: 700 17px var(--f-texto);
+  transition: border-color 160ms ease;
 }
 .busca input::placeholder {
-  color: #9a82b3;
-  opacity: 1;
-}
-.busca input:hover {
-  border-color: #6a4aa3;
+  color: rgba(255, 246, 251, 0.5);
 }
 .busca input:focus {
   outline: none;
   border-color: var(--ciano);
-  box-shadow: 0 0 0 3px rgba(49, 231, 255, 0.25);
 }
-.busca input::-webkit-search-cancel-button {
-  filter: invert(1) brightness(1.4);
-  cursor: pointer;
+.busca input:focus-visible {
+  outline: 3px solid var(--ciano);
+  outline-offset: 2px;
 }
-
 .busca-resultado {
-  margin-top: 10px;
   min-height: 1.5em;
+  margin: 8px 0 4px;
+  font-size: 14px;
   color: var(--suave);
-  font-size: 0.9375rem;
 }
 
 .lista {
   list-style: none;
+  margin: 0;
   padding: 0;
-  margin-top: 8px;
-  display: grid;
-  column-gap: 40px;
 }
-@media (min-width: 760px) {
-  .lista {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
 .pessoa {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: "nome nums" "plat nums";
+  gap: 6px 10px;
   align-items: center;
-  gap: 2px 14px;
-  padding: 12px 0;
+  padding: 11px 4px;
   border-bottom: 1px solid var(--linha);
 }
+.pessoa:last-child {
+  border-bottom: 0;
+}
+.pessoa:focus {
+  outline: 2px solid var(--ciano);
+  outline-offset: 2px;
+}
 .pessoa-nome {
-  grid-area: nome;
-  font-family: var(--f-nome);
-  font-weight: 800;
-  font-size: 1.0625rem;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
   min-width: 0;
+  overflow-wrap: anywhere;
+  font: 800 17px / 1.25 var(--f-nome);
 }
 .pessoa-plat {
-  grid-area: plat;
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--apagado);
-}
-.pessoa-plat[data-plat="tiktok"] {
-  color: #ff8fc0;
-}
-.pessoa-plat[data-plat="youtube"] {
-  color: #ffa98a;
-}
-.pessoa-plat[data-plat="kick"] {
-  color: #8ff0a4;
-}
-
-.nums {
-  grid-area: nums;
-  list-style: none;
-  padding: 0;
-  display: flex;
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
+  padding: 3px 10px 3px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--linha);
+  background: rgba(255, 255, 255, 0.05);
+  font: 700 12px / 1.3 var(--f-texto);
+  color: var(--suave);
+  white-space: nowrap;
+}
+.pessoa-plat img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+.pessoa-plat img.branco {
+  filter: invert(1);
+}
+.nums {
+  grid-column: 1 / -1;
+  list-style: none;
+  display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
 }
 .num-chip {
-  font-family: var(--f-num);
-  font-weight: 800;
-  font-size: 1.0625rem;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(49, 231, 255, 0.4);
+  background: rgba(49, 231, 255, 0.08);
+  font: 800 17px / 1.3 var(--f-num);
+  color: var(--ciano);
   font-variant-numeric: tabular-nums;
-  line-height: 1;
-  min-width: 2.6em;
-  text-align: center;
-  padding: 7px 8px 6px;
-  border-radius: 8px;
-  background: var(--noite-3);
-  color: var(--texto);
 }
 .num-chip small {
-  font-size: 0.7em;
-  color: var(--apagado);
-  margin-right: 1px;
+  font-size: 11px;
   font-weight: 700;
+  color: var(--suave);
 }
 .num-chip.achado {
-  background: var(--sol);
+  background: var(--ciano);
+  border-color: var(--ciano);
   color: var(--noite);
+  animation: achou 520ms var(--entra) both;
 }
 .num-chip.achado small {
-  color: #6b3a00;
+  color: rgba(18, 7, 42, 0.75);
 }
-
+@keyframes achou {
+  0% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 .pessoa.vencedora .pessoa-nome {
   color: var(--ouro);
 }
 
-.lista-vazia {
-  margin-top: 18px;
-  color: var(--suave);
-  max-width: 60ch;
-}
-
-/* ---------- Resultado ---------- */
-.resultado {
-  background: linear-gradient(160deg, #3a0f5c 0%, #5a1366 60%, #7a1a63 100%);
-  border-color: rgba(255, 179, 71, 0.4);
-}
-.resultado-fonte {
-  margin-top: 8px;
-  color: #f2c6e4;
-}
-.resultado-grade {
-  margin-top: 22px;
-  display: grid;
-  gap: 22px;
-}
-@media (min-width: 760px) {
-  .resultado-grade {
-    grid-template-columns: auto 1fr;
-    gap: 40px;
-  }
-}
-.resultado-passo h3 {
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #f2c6e4;
-  margin-bottom: 10px;
-}
-.dezenas {
-  list-style: none;
-  padding: 0;
+.ver-todos {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.dezenas li {
-  font-family: var(--f-num);
-  font-weight: 800;
-  font-size: 1.625rem;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  padding: 10px 12px 9px;
-  border-radius: 10px;
-  background: var(--noite);
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 56px;
+  margin: 14px 0 0;
+  padding: 4px 6px;
+  background: none;
   color: var(--texto);
-  min-width: 2.4em;
+  font: 800 16px var(--f-texto);
+  cursor: pointer;
+  transition: transform 160ms ease-out;
+}
+.ver-todos:active {
+  transform: scale(0.97);
+}
+.ver-todos[hidden] {
+  display: none;
+}
+.lista-vazia {
+  margin: 10px 0 0;
+  padding: 16px;
+  border-radius: var(--raio-card);
+  border: 1px dashed rgba(255, 46, 136, 0.5);
+  font-weight: 700;
   text-align: center;
 }
-.conta {
-  font-family: var(--f-num);
-  font-weight: 700;
-  font-size: 1.125rem;
-  line-height: 1.5;
-  color: var(--texto);
-  overflow-wrap: anywhere;
-  font-variant-numeric: tabular-nums;
-}
-.conta b {
-  font-weight: 800;
-  color: var(--sol);
-}
 
-.vencedor {
-  margin-top: 26px;
-  padding-top: 22px;
-  border-top: 1px solid rgba(255, 246, 251, 0.18);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 18px 44px;
-}
-.vencedor p {
+/* ---------- Top apoiadores ---------- */
+.top-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
-  gap: 4px;
+  gap: 6px;
 }
-.rotulo {
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #f2c6e4;
+.top-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 4px 10px 4px 6px;
+  border-radius: 10px;
 }
-.vencedor-valor {
-  font-family: var(--f-num);
-  font-weight: 800;
-  font-size: clamp(3.5rem, 14vw, 5.5rem);
-  line-height: 0.85;
-  color: var(--sol);
-  font-variant-numeric: tabular-nums;
+.top-item.podio,
+.top-item.primeiro {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--linha);
 }
-.vencedor-apelido {
-  font-family: var(--f-nome);
-  font-weight: 900;
-  font-size: clamp(1.5rem, 6vw, 2.25rem);
-  line-height: 1.1;
-  color: var(--texto);
-  overflow-wrap: anywhere;
+.top-item.primeiro {
+  border-color: rgba(255, 211, 106, 0.5);
+  background: rgba(255, 211, 106, 0.08);
 }
-.selo {
-  display: inline-block !important;
-  font-weight: 800;
-  font-size: 0.875rem;
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: var(--noite);
-  color: var(--sol);
-  align-self: center;
+.top-pos {
+  width: 2.4em;
+  flex: none;
+  text-align: center;
+  font: 800 18px var(--f-num);
+  color: var(--suave);
 }
-.selo.ok {
-  background: #0f3b2a;
-  color: #8ff0a4;
+.top-medalha {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  margin: 0 -2px;
 }
-.resultado .nota {
-  margin-top: 14px;
-  color: #f2c6e4;
+.top-nome {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 800 17px var(--f-nome);
+}
+.top-item.primeiro .top-nome {
+  color: var(--ouro);
+}
+.top-vazio {
+  margin: 0;
+  padding: 20px 8px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--suave);
 }
 
 /* ---------- Regulamento ---------- */
-.regulamento {
-  padding: 0;
-}
-.regulamento > details > summary {
+.regulamento summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
   cursor: pointer;
   list-style: none;
-  padding: clamp(20px, 4vw, 30px) clamp(20px, 4vw, 36px);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  font-family: var(--f-titulo);
-  text-transform: uppercase;
-  font-size: clamp(1.5rem, 5vw, 2rem);
-  line-height: 1;
-  border-radius: var(--raio);
 }
-.regulamento > details > summary::-webkit-details-marker {
+.regulamento summary::-webkit-details-marker {
   display: none;
+}
+.regulamento > details > summary .sec-titulo {
+  margin: 0;
 }
 .regulamento > details > summary::after {
   content: "Abrir";
-  font-family: var(--f-texto);
-  font-size: 0.875rem;
-  font-weight: 800;
-  text-transform: none;
-  color: var(--sol);
+  flex: none;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 46, 136, 0.6);
+  background: rgba(255, 46, 136, 0.14);
+  font: 800 13px var(--f-texto);
+  transition: transform 160ms ease-out;
 }
 .regulamento > details[open] > summary::after {
   content: "Fechar";
 }
-.regulamento > details > summary:hover::after {
-  color: var(--ouro);
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
+.regulamento > details > summary:active::after {
+  transform: scale(0.97);
 }
-
 .reg-texto {
-  padding: 0 clamp(20px, 4vw, 36px) clamp(24px, 4vw, 36px);
   max-width: 72ch;
-  color: var(--suave);
+  padding-top: 6px;
 }
 .reg-texto h3 {
-  font-family: var(--f-nome);
-  font-weight: 800;
-  font-size: 1.125rem;
-  color: var(--texto);
-  margin: 28px 0 10px;
-}
-.reg-texto h3:first-child {
-  margin-top: 4px;
+  margin: 20px 0 6px;
+  font: 800 17px var(--f-texto);
+  color: var(--rosa-claro);
 }
 .reg-texto ul,
 .reg-texto ol {
-  padding-left: 1.25em;
-  display: grid;
-  gap: 8px;
+  margin: 0;
+  padding-left: 1.2em;
 }
-.reg-texto li::marker {
-  color: var(--rosa);
+.reg-texto li {
+  margin: 4px 0;
+}
+.reg-texto p {
+  margin: 6px 0;
+}
+.ver-conta {
+  margin: 10px 0;
+  padding: 10px 14px;
+  border-radius: var(--raio-card);
+  border: 1px solid var(--linha);
+  background: rgba(255, 255, 255, 0.04);
+}
+.ver-conta summary {
+  min-height: 40px;
   font-weight: 800;
+  color: var(--ciano);
 }
-
+.ver-conta summary::after {
+  content: "+";
+  font: 800 22px var(--f-num);
+}
+.ver-conta[open] summary::after {
+  content: "−";
+}
 .exemplo {
-  margin-top: 16px;
-  padding: 16px 18px;
-  border-radius: 12px;
-  background: var(--noite);
-  display: grid;
-  gap: 4px;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(13, 5, 24, 0.7);
 }
 .exemplo-titulo {
   font-weight: 800;
-  color: var(--texto);
-  margin-bottom: 4px;
 }
 .num {
-  font-family: var(--f-num);
-  font-weight: 800;
-  font-size: 1.1em;
-  color: var(--texto);
-  font-variant-numeric: tabular-nums;
+  font: 800 18px var(--f-num);
+  color: var(--ciano);
+  letter-spacing: 0.03em;
 }
 .num.destaque {
-  color: var(--sol);
-  font-size: 1.3em;
+  color: var(--ouro);
 }
 .isencao {
-  margin-top: 26px;
-  font-size: 0.875rem;
+  margin-top: 20px !important;
+  font-size: 13px;
+  color: var(--suave);
 }
 
+/* ---------- Resultado ---------- */
+.resultado {
+  margin: 0 0 18px;
+  padding: 6px 4px;
+}
+.resultado-fonte {
+  margin: -6px 0 14px;
+  color: var(--suave);
+  font-weight: 700;
+}
+.resultado-grade {
+  display: grid;
+  gap: 14px;
+}
+.resultado-passo h3 {
+  margin: 0 0 6px;
+  font: 800 12px var(--f-num);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rosa-claro);
+}
+.dezenas {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+.dezenas li {
+  min-width: 42px;
+  padding: 4px 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(49, 231, 255, 0.45);
+  background: rgba(49, 231, 255, 0.08);
+  text-align: center;
+  font: 800 22px / 1.2 var(--f-num);
+  color: var(--ciano);
+}
+.conta {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.conta b {
+  font: 800 18px var(--f-num);
+  color: var(--ciano);
+}
+.vencedor {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--linha);
+}
+.vencedor p {
+  margin: 0;
+}
+.rotulo {
+  display: block;
+  font: 800 12px var(--f-num);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rosa-claro);
+}
+.vencedor-valor {
+  font: 800 54px / 1 var(--f-num);
+  color: var(--ciano);
+}
+.vencedor-apelido {
+  font: 900 28px / 1.15 var(--f-nome);
+  color: var(--ouro);
+  overflow-wrap: anywhere;
+}
+.vencedor-premio-valor {
+  font: 800 20px var(--f-texto);
+}
+.selo {
+  justify-self: start;
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 138, 60, 0.6);
+  background: rgba(255, 138, 60, 0.14);
+  font: 800 14px var(--f-texto);
+}
+.selo.ok {
+  border-color: rgba(49, 231, 255, 0.6);
+  background: rgba(49, 231, 255, 0.12);
+}
+
+/* ================= RODAPÉ ================= */
+.rodape {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 26px 16px 40px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--suave);
+}
+.rodape-mono {
+  width: 110px;
+  height: auto;
+  opacity: 0.9;
+}
+.rodape-texto p {
+  margin: 4px 0;
+}
+.rodape-isencao {
+  max-width: 52ch;
+  font-size: 12px;
+}
+
+/* ---------- Selo "Apoiador" (brilho que respira devagar + reflexo que passa de vez em quando) ---------- */
+.pessoa-quem {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  min-width: 0;
+}
+.selo-apoiador {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 10px 2px 5px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 211, 106, 0.75);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 46, 136, 0.32),
+    rgba(255, 211, 106, 0.2)
+  );
+  box-shadow:
+    0 0 8px rgba(255, 46, 136, 0.45),
+    inset 0 0 6px rgba(255, 211, 106, 0.18);
+  font: 800 11px / 1.4 var(--f-texto);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffe7a8;
+  white-space: nowrap;
+}
+.selo-apoiador img {
+  position: relative;
+  width: 16px;
+  height: 16px;
+}
+.selo-apoiador > span:last-child {
+  position: relative;
+}
+/* halo rosa/dourado que respira (só opacidade) */
+.selo-apoiador::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    0 0 14px 2px rgba(255, 46, 136, 0.6),
+    0 0 6px 1px rgba(255, 211, 106, 0.55);
+  opacity: 0.55;
+  pointer-events: none;
+}
+/* reflexo: faixa clara que atravessa a pílula (só transform) */
+.selo-brilho {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+.selo-brilho::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 45%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 246, 251, 0.55),
+    transparent
+  );
+  transform: translateX(-120%) skewX(-20deg);
+}
 @media (prefers-reduced-motion: no-preference) {
-  .regulamento details[open] .reg-texto {
-    animation: abrir 0.5s var(--entra);
+  .selo-apoiador::before {
+    animation: selo-respira 3.6s ease-in-out infinite alternate;
+  }
+  .selo-brilho::after {
+    animation: selo-reflexo 5.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  /* reflexos em tempos diferentes para não passarem todos juntos */
+  .pessoa:nth-child(3n + 2) .selo-brilho::after,
+  .pessoa:nth-child(3n + 2) .selo-apoiador::before {
+    animation-delay: 1.8s;
+  }
+  .pessoa:nth-child(3n) .selo-brilho::after,
+  .pessoa:nth-child(3n) .selo-apoiador::before {
+    animation-delay: 3.6s;
   }
 }
-@keyframes abrir {
+@keyframes selo-respira {
+  from {
+    opacity: 0.3;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes selo-reflexo {
+  0% {
+    transform: translateX(-120%) skewX(-20deg);
+  }
+  22%,
+  100% {
+    transform: translateX(260%) skewX(-20deg);
+  }
+}
+
+/* ---------- Top Apoiadores: prêmio garantido do pódio ---------- */
+.top-sub {
+  margin: -6px 0 14px;
+  font-size: 14px;
+  color: var(--suave);
+}
+.top-sub strong {
+  color: var(--texto);
+}
+.top-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0;
+}
+.top-info .top-nome {
+  flex: none;
+}
+.top-nome.vago {
+  color: var(--suave);
+  font-family: var(--f-texto);
+  font-weight: 700;
+  font-size: 15px;
+}
+.top-item.primeiro .top-nome.vago {
+  color: var(--suave);
+}
+.top-premio {
+  font: 800 14px / 1.3 var(--f-texto);
+  color: var(--ciano);
+}
+.top-item.primeiro .top-premio {
+  color: var(--ouro);
+}
+.top-min {
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--suave);
+}
+
+/* ---------- Ganchos do "Como participar": DOBROU! e ATÉ 10 ---------- */
+.passo.gancho-dobrou {
+  border-color: rgba(255, 211, 106, 0.6);
+  background: rgba(255, 211, 106, 0.07);
+}
+.passo.gancho-ate10 {
+  border-color: rgba(49, 231, 255, 0.55);
+  background: rgba(49, 231, 255, 0.06);
+}
+.gancho .passo-valor {
+  letter-spacing: 0;
+}
+.gancho-pilula {
+  display: inline-block;
+  padding: 2px 14px;
+  border-radius: 999px;
+  font: 800 16px / 1.35 var(--f-num);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+/* conquista = dourado */
+.gancho-dobrou .gancho-pilula {
+  background: linear-gradient(90deg, var(--ouro), #fff3c8);
+  color: var(--noite);
+  box-shadow: 0 0 12px rgba(255, 211, 106, 0.45);
+}
+/* número = ciano */
+.gancho-ate10 .gancho-pilula {
+  border: 1px solid rgba(49, 231, 255, 0.7);
+  background: rgba(49, 231, 255, 0.14);
+  color: var(--texto);
+}
+.gancho-ate10 .gancho-pilula b {
+  font-size: 20px;
+  line-height: 1;
+  color: var(--ciano);
+  margin: 0;
+}
+.passo-texto b.n {
+  font: 800 1.1em var(--f-num);
+  color: var(--ciano);
+  white-space: nowrap;
+}
+.js .revela .gancho-pilula {
+  opacity: 0;
+}
+.js .revela.visto .gancho-pilula {
+  animation: gancho-entra 520ms var(--entra) both;
+  animation-delay: calc(var(--i, 0) * 70ms + 420ms);
+}
+@keyframes gancho-entra {
   from {
     opacity: 0;
-    transform: translateY(-6px);
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .js .revela.visto .gancho-pilula {
+    animation: rapido 200ms ease-out both;
+    animation-delay: 0ms;
+  }
+}
+
+/* ---------- Selo "Completo" (fez os 3 e dobrou): ciano e parado, diferente do Apoiador ---------- */
+.selo-completo {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(49, 231, 255, 0.65);
+  background: rgba(49, 231, 255, 0.12);
+  font: 800 11px / 1.5 var(--f-num);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ciano);
+  white-space: nowrap;
+}
+
+/* ---------- Presente (opcional): mais chances, separado dos jeitos grátis ---------- */
+.extra {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--linha);
+}
+.extra-titulo {
+  margin: 0 0 10px;
+  font: 800 15px / 1.3 var(--f-texto);
+  color: var(--rosa-claro);
+}
+.passo.gancho-presente {
+  border-color: rgba(255, 46, 136, 0.55);
+  background: rgba(255, 46, 136, 0.07);
+}
+.gancho-presente .gancho-pilula {
+  border: 1px solid rgba(255, 46, 136, 0.7);
+  background: rgba(255, 46, 136, 0.18);
+  color: var(--texto);
+}
+/* "+n por presente" na lista: pequeno, sem disputar com os números */
+.pessoa-pagos {
+  grid-column: 1 / -1;
+  margin-top: -2px;
+  font: 700 12px / 1.3 var(--f-texto);
+  color: var(--suave);
+}
+
+/* linha curta do "passou de 50" (fica na coluna do texto, menor e mais suave) */
+.passo-extra {
+  grid-column: 2;
+  margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--linha);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--suave);
+}
+
+/* ================= COMPUTADOR ================= */
+@media (min-width: 860px) {
+  .topo {
+    min-height: min(56vw, 860px);
+  }
+  .topo-capa {
+    inset: 0;
+    height: auto;
+    -webkit-mask-image: linear-gradient(180deg, #000 82%, transparent);
+    mask-image: linear-gradient(180deg, #000 82%, transparent);
+  }
+  .capa-img {
+    left: auto;
+    right: 0;
+    width: auto;
+    aspect-ratio: 2000 / 1116;
+    background-size: cover;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%);
+    mask-image: linear-gradient(90deg, transparent, #000 22%);
+  }
+  .topo-conteudo {
+    width: min(100%, 1180px);
+    margin: 0 auto;
+    align-items: flex-start;
+    padding: 40px 24px 64px;
+    text-align: left;
+  }
+  .topo-conteudo > * {
+    max-width: min(520px, 44cqw);
+  }
+  .logo {
+    width: 168px;
+  }
+  .titulo {
+    margin-top: 18px;
+  }
+  .titulo .t1 {
+    font-size: 48px;
+  }
+  .titulo .t2 {
+    font-size: clamp(110px, 11cqw, 150px);
+  }
+  .fatos {
+    justify-content: flex-start;
+    margin-top: 22px;
+    gap: 4px 26px;
+  }
+  .meta-texto {
+    max-width: 44ch;
+  }
+
+  .conteudo {
+    padding: 0 24px 32px;
+  }
+  .grade {
+    grid-template-columns: 7fr 5fr;
+    grid-template-areas:
+      "como redes"
+      "part top"
+      "reg reg";
+    gap: 24px;
+    align-items: start;
+  }
+  .como {
+    grid-area: como;
+  }
+  .redes {
+    grid-area: redes;
+  }
+  .participantes {
+    grid-area: part;
+  }
+  .top {
+    grid-area: top;
+  }
+  .regulamento {
+    grid-area: reg;
+  }
+  .k-painel {
+    padding: 14px 16px 16px;
+  }
+  .resultado {
+    padding: 10px 14px;
+  }
+  .resultado-grade {
+    grid-template-columns: 1fr 1fr;
+  }
+  .vencedor {
+    grid-template-columns: auto 1fr auto;
+    align-items: end;
+    gap: 24px;
+  }
+  .vencedor-premio {
+    grid-column: 1 / -1;
+  }
+  .selo {
+    justify-self: end;
+  }
+}
+
+@media (max-width: 400px) {
+  .k-barra {
+    border-width: 9px 30px;
+  }
+  .k-painel {
+    border-width: 18px;
+  }
+  .k-moldura {
+    border-width: 20px;
+  }
+  .rede-tag {
+    width: 6.6em;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+  }
+  .rede-arroba {
+    font-size: 16px;
+  }
+}
+
+/* ================= MOVIMENTO ================= */
+/* Hover só onde existe mouse de verdade (no celular o toque gera hover falso) */
+@media (hover: hover) and (pointer: fine) {
+  .rede:hover {
+    transform: translateX(6px);
+  }
+  .rede:hover .rede-tag {
+    color: var(--texto);
+  }
+  .ver-todos:hover {
+    transform: translateY(-2px);
+  }
+  .rede,
+  .ver-todos {
+    transition: transform 200ms var(--entra);
+  }
+  .rede:active,
+  .ver-todos:active {
+    transform: scale(0.97);
+    transition-duration: 120ms;
+  }
+}
+
+/* Tudo abaixo só vale com JavaScript ligado: sem JS, a página aparece inteira e parada */
+
+/* 1) Entrada do topo (uma vez, ao abrir) */
+.js .capa-img {
+  animation: capa-entra 1.8s var(--entra) both;
+}
+@keyframes capa-entra {
+  from {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+  40% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.js .logo {
+  animation:
+    logo-entra 700ms var(--entra) 80ms both,
+    logo-brilho 1.4s ease-out 80ms both;
+}
+@keyframes logo-entra {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes logo-brilho {
+  from {
+    filter: drop-shadow(0 0 0 rgba(255, 46, 136, 0))
+      drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6));
+  }
+  45% {
+    filter: drop-shadow(0 0 26px rgba(255, 46, 136, 0.95))
+      drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6));
+  }
+  to {
+    filter: drop-shadow(0 0 16px rgba(255, 46, 136, 0.7))
+      drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6));
+  }
+}
+.js .titulo .t1,
+.js .titulo .t2 {
+  animation: titulo-entra 600ms var(--entra) both;
+}
+.js .titulo .t1 {
+  animation-delay: 220ms;
+}
+.js .titulo .t2 {
+  animation-delay: 320ms;
+}
+@keyframes titulo-entra {
+  from {
+    opacity: 0;
+    transform: translateX(-48px) skewX(-6deg);
+  }
+  to {
+    opacity: 1;
+    transform: skewX(-6deg);
+  }
+}
+/* barras abrem como uma cortina, da esquerda para a direita */
+.js .topo .fatos,
+.js .topo .meta {
+  animation: barra-abre 600ms var(--entra) both;
+}
+.js .topo .fatos {
+  animation-delay: 480ms;
+}
+.js .topo .meta {
+  animation-delay: 600ms;
+}
+@keyframes barra-abre {
+  from {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+.js .meta-texto {
+  animation: sobe 500ms var(--entra) 760ms both;
+}
+@keyframes sobe {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -932,160 +1524,133 @@ kbd {
   }
 }
 
-/* ---------- Rodapé ---------- */
-.rodape {
-  width: min(calc(100% - 2 * var(--margem)), calc(var(--largura) - 2 * var(--margem)));
-  margin: clamp(40px, 7vw, 72px) auto 0;
-  padding: 28px 0 48px;
-  border-top: 1px solid var(--linha);
-  display: grid;
-  gap: 8px;
-  color: var(--suave);
-  font-size: 0.9375rem;
+/* 2) Painéis aparecem quando chegam na tela (IntersectionObserver) */
+.js .revela {
+  opacity: 0;
+  transform: translateY(28px) scale(0.98);
+  transition:
+    opacity 600ms var(--entra),
+    transform 600ms var(--entra);
 }
-.rodape-atualizado {
-  color: var(--apagado);
-  font-size: 0.875rem;
+.js .revela.visto {
+  opacity: 1;
+  transform: none;
 }
-.rodape-isencao {
-  color: var(--apagado);
-  font-size: 0.8125rem;
+/* itens fixos dentro do painel entram em sequência */
+.js .revela .passo,
+.js .revela .redes-lista > li {
+  opacity: 0;
+  transform: translateX(-18px);
+  transition:
+    opacity 500ms var(--entra),
+    transform 500ms var(--entra);
+  transition-delay: calc(var(--i, 0) * 70ms + 180ms);
+}
+.js .revela.visto .passo,
+.js .revela.visto .redes-lista > li {
+  opacity: 1;
+  transform: none;
 }
 
-@media (max-width: 420px) {
-  .passo {
-    grid-template-columns: 1fr;
-    gap: 6px;
+/* 3) Listas que vêm do JSON (ranking e participantes) entram em cascata */
+.js .revela .entra {
+  opacity: 0;
+}
+.js .revela.visto .entra {
+  animation: linha-entra 500ms var(--entra) both;
+  animation-delay: calc(var(--i, 0) * 45ms + 120ms);
+}
+@keyframes linha-entra {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* ranking entra pela direita, igual ao TOP do overlay */
+.js .revela.visto .top-item.entra {
+  animation-name: rank-entra;
+  animation-delay: calc(var(--i, 0) * 70ms + 160ms);
+}
+@keyframes rank-entra {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.js .revela.visto .top-item.entra .top-medalha {
+  animation: medalha-entra 600ms var(--entra) both;
+  animation-delay: calc(var(--i, 0) * 70ms + 300ms);
+}
+@keyframes medalha-entra {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-20deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* resultado da busca: só um esmaecer rápido, sem esperar (a pessoa digita várias vezes) */
+.js .entra-rapido {
+  animation: rapido 180ms ease-out both;
+}
+@keyframes rapido {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
-/* botão "ver todos" da lista */
-.ver-todos {
-  margin-top: 20px;
-  font: inherit;
-  font-weight: 800;
-  font-size: 1rem;
-  color: var(--noite);
-  background: var(--sol);
-  border: 0;
-  border-radius: 12px;
-  padding: 14px 22px;
-  min-height: 50px;
-  cursor: pointer;
-  box-shadow: 0 10px 24px -12px rgba(255, 138, 60, 0.6);
-  transition: background-color 0.2s ease, transform 0.2s var(--entra);
-}
-.ver-todos:hover { background: var(--ouro); }
-.ver-todos:active { transform: translateY(1px); }
-.pessoa:focus { outline: none; }
-.pessoa:focus-visible { outline: 3px solid var(--ciano); outline-offset: 2px; }
-
-/* as 6 dezenas sempre numa linha só */
-.dezenas { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); max-width: 420px; gap: 6px; }
-.dezenas li { min-width: 0; padding: 10px 0 9px; font-size: clamp(1.25rem, 5.5vw, 1.625rem); }
-
-/* no celular, a lista de participantes vem antes do Top Apoiadores */
-@media (max-width: 959px) {
-  .colunas, .coluna-principal { display: contents; }
-  .top { order: 5; }
-  .regulamento { order: 6; }
-}
-
-/* "Ver a conta" dentro do regulamento */
-.ver-conta {
-  margin-top: 14px;
-  border: 1px solid var(--linha);
-  border-radius: 12px;
-  background: rgba(18, 7, 42, 0.5);
-}
-.ver-conta > summary {
-  cursor: pointer;
-  list-style: none;
-  padding: 12px 16px;
-  font-weight: 800;
-  color: var(--sol);
-  border-radius: 12px;
-}
-.ver-conta > summary::-webkit-details-marker {
-  display: none;
-}
-.ver-conta > summary::after {
-  content: " +";
-}
-.ver-conta[open] > summary::after {
-  content: " −";
-}
-.ver-conta > summary:hover {
-  color: var(--ouro);
-}
-.ver-conta-texto {
-  padding: 0 16px 16px;
-}
-.ver-conta-texto .exemplo {
-  margin-top: 14px;
-}
-
-/* celular: prêmio numa linha, data e "Grátis" na de baixo */
-@media (max-width: 520px) {
-  .fatos .fato:first-child { flex-basis: 100%; }
-  .fatos .fato-sep-1 { display: none; }
-}
-
-/* prêmio que valeu, no resultado */
-.vencedor-premio-valor {
-  font-family: var(--f-nome);
-  font-weight: 900;
-  font-size: clamp(1.25rem, 5vw, 1.625rem);
-  line-height: 1.15;
-  color: var(--sol);
-}
-
-/* ---------- Capa (arte do Flow aprovada pelo dono: assets/capa.webp e capa-1200.webp) ----------
-   Celular: a capa fica ACIMA do título, recortada no lado da caixa do jogo (caixa inteira),
-   e some num degradê para a noite; o texto fica fora da imagem (contraste igual ao de antes).
-   Computador: a capa ocupa o topo todo; o título fica no lado escuro e a caixa inteira à direita. */
-@media (max-width: 899px) {
-  .topo {
-    background:
-      linear-gradient(180deg, rgba(18, 7, 42, 0) 0, rgba(18, 7, 42, 0) 62vw, var(--noite) 70vw) top / 100% 70vw no-repeat,
-      url("assets/capa-1200.webp") right -31.6vw / 182vw auto no-repeat,
-      linear-gradient(
-        180deg,
-        var(--noite) 0,
-        var(--noite) 70vw,
-        #2a0d4f 70%,
-        #4e1262 80%,
-        #7a1868 88%,
-        #b5246b 94%,
-        var(--laranja) 100%
-      );
-    padding-top: 68vw;
+/* Movimento reduzido: só esmaecer curto, nada se desloca */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
-}
-@media (min-width: 900px) {
-  .topo {
-    min-height: min(55.8vw, 900px);
-    display: flex;
-    align-items: center;
-    padding: clamp(40px, 5vw, 72px) 0 clamp(72px, 8vw, 110px);
-    background:
-      linear-gradient(90deg, rgba(4, 3, 12, 0.85) 0%, rgba(4, 3, 12, 0.6) 38%, rgba(4, 3, 12, 0) 58%),
-      linear-gradient(180deg, rgba(18, 7, 42, 0) 94%, var(--noite) 100%),
-      url("assets/capa.webp") right center / auto 100% no-repeat,
-      linear-gradient(180deg, #03030a 0%, #05040d 30%, #0f0617 60%, #15061a 90%);
+  .js .capa-img,
+  .js .logo,
+  .js .titulo .t1,
+  .js .titulo .t2,
+  .js .topo .fatos,
+  .js .topo .meta,
+  .js .meta-texto {
+    animation: rapido 200ms ease-out both;
   }
-  .topo-conteudo {
-    width: 100%;
+  .js .revela,
+  .js .revela .passo,
+  .js .revela .redes-lista > li {
+    transform: none;
+    transition: opacity 200ms ease-out;
+    transition-delay: 0ms;
   }
-  /* o texto fica só no lado escuro da capa */
-  .topo-conteudo > * {
-    max-width: 44vw;
+  .js .revela.visto .entra,
+  .js .revela.visto .top-item.entra,
+  .js .revela.visto .top-item.entra .top-medalha {
+    animation: rapido 200ms ease-out both;
+    animation-delay: 0ms;
   }
-  .conteudo {
-    margin-top: -24px;
+  .num-chip.achado {
+    animation: rapido 200ms ease-out both;
   }
-}
-@media (min-width: 900px) and (max-width: 1199px) {
-  .fatos .fato:first-child { flex-basis: 100%; }
-  .fatos .fato-sep-1 { display: none; }
+  .m-cheio {
+    transition: none;
+  }
+  .rede,
+  .ver-todos {
+    transition: none;
+  }
+  .rede:hover,
+  .ver-todos:hover {
+    transform: none;
+  }
 }

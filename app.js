@@ -16,6 +16,17 @@
   var $ = function (id) {
     return document.getElementById(id);
   };
+  var ICONES = {
+    tiktok: { src: "assets/icones/tiktok.svg", branco: true },
+    instagram: { src: "assets/icones/instagram.svg", branco: true },
+    youtube: { src: "assets/icones/youtube.svg" },
+    kick: { src: "assets/icones/kick.png" },
+  };
+  var reduzido =
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var inicioCascata = 0; // no "ver todos", só os novos entram em cascata
+  var ultimoTexto = null; // JSON da última vez (se não mudou, não redesenha)
   var dados = null;
   var carregouUmaVez = false;
   var mostrarTodos = false;
@@ -60,44 +71,153 @@
         dataBR(ciclo.fim).slice(0, 5); // só dia/mês: "31/12"
   }
 
-  function renderMeta(d) {
+  var metaAtual = 0; // valor que está aparecendo na tela agora
+  var contagem = null;
+
+  // número sobe de "de" até "ate" junto com a barra (mesma curva de saída suave)
+  function contar(de, ate, ms) {
+    var alvo = $("meta-valor");
+    if (contagem) cancelAnimationFrame(contagem);
+    if (reduzido || de === ate) {
+      alvo.textContent = ate;
+      return;
+    }
+    var inicio = null;
+    function passo(t) {
+      if (inicio === null) inicio = t;
+      var p = Math.min(1, (t - inicio) / ms);
+      var suave = 1 - Math.pow(1 - p, 4);
+      alvo.textContent = Math.round(de + (ate - de) * suave);
+      if (p < 1) contagem = requestAnimationFrame(passo);
+    }
+    contagem = requestAnimationFrame(passo);
+  }
+
+  function renderMeta(d, primeira) {
     var pct = Number(d.meta && d.meta.pct);
     if (!isFinite(pct)) pct = 0;
     pct = Math.max(0, Math.min(100, Math.round(pct)));
-    $("meta-valor").textContent = pct;
     var barra = $("meta-barra");
     barra.setAttribute("aria-valuenow", pct);
     barra.setAttribute("aria-valuetext", pct + "% da meta");
     var preenchido = $("meta-preenchido");
-    // espera um quadro na primeira vez para a barra crescer suave
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        preenchido.style.setProperty("--meta", pct / 100);
-      });
-    });
+    var de = metaAtual;
+    metaAtual = pct;
+    // na primeira vez espera a barra abrir na tela; depois anima direto
+    setTimeout(
+      function () {
+        // transform direto no elemento (sem variável CSS herdada)
+        preenchido.style.transform = "scaleX(" + pct / 100 + ")";
+        contar(de, pct, 1600);
+        $("meta-secao").classList.toggle("feito", pct >= 100);
+      },
+      primeira && !reduzido ? 750 : 0,
+    );
   }
 
   /* ---------- Top apoiadores ---------- */
-  function renderTop(d) {
+  // prêmios garantidos do Top 3 (se o servidor não mandar, valem estes)
+  var PREMIOS_TOP = [
+    "Gift card R$ 100 + pacote Lenda",
+    "Cargo VIP no Discord + destaque na live",
+    "Cargo VIP no Discord + destaque na live",
+  ];
+  var MINIMO_TOP = [5000, 0, 0];
+
+  function premiosTop(d) {
+    var ciclo = d.ciclo || {};
+    var p = lista(ciclo.premiosTop);
+    var m = lista(ciclo.minimoTop);
+    return [0, 1, 2].map(function (i) {
+      var min = Number(m[i] != null ? m[i] : MINIMO_TOP[i]);
+      return {
+        premio: p[i] ? String(p[i]) : PREMIOS_TOP[i],
+        minimo: isFinite(min) && min > 0 ? min : 0,
+      };
+    });
+  }
+
+  function textoMinimo(min) {
+    return "mín. " + milhar(min) + " moedas no ciclo";
+  }
+
+  function renderRegTop(d) {
+    var ul = $("reg-top");
+    if (!ul) return;
+    ul.replaceChildren();
+    premiosTop(d).forEach(function (p, i) {
+      ul.append(
+        el(
+          "li",
+          null,
+          i +
+            1 +
+            "º: " +
+            p.premio +
+            (p.minimo ? " (" + textoMinimo(p.minimo) + ")" : ""),
+        ),
+      );
+    });
+  }
+
+  function renderTop(d, animar) {
     var ol = $("top-lista");
+    var premios = premiosTop(d);
     var itens = lista(d.ranking)
       .slice()
       .sort(function (a, b) {
         return (a.pos || 0) - (b.pos || 0);
       })
       .slice(0, 10);
+    // o pódio sempre aparece (com o prêmio), mesmo antes de ter nomes
+    [1, 2, 3].forEach(function (pos) {
+      var tem = itens.some(function (r) {
+        return r.pos === pos;
+      });
+      if (!tem) itens.push({ pos: pos, nome: null });
+    });
+    itens.sort(function (a, b) {
+      return (a.pos || 0) - (b.pos || 0);
+    });
     ol.replaceChildren();
-    itens.forEach(function (r) {
+    var temNome = false;
+    itens.forEach(function (r, i) {
       var li = el(
         "li",
         "top-item" + (r.pos === 1 ? " primeiro" : r.pos <= 3 ? " podio" : ""),
       );
+      if (animar) {
+        li.classList.add("entra");
+        li.style.setProperty("--i", i);
+      }
       var pos = el("span", "top-pos", r.pos + "º");
       pos.setAttribute("aria-label", r.pos + "º lugar");
-      li.append(pos, el("span", "top-nome", r.nome || "—"));
+      li.append(pos);
+      if (r.pos >= 1 && r.pos <= 3) {
+        // medalhas geradas do overlay (ico-medalha-1/2/3)
+        var med = el("img", "top-medalha");
+        med.src = "assets/ico-medalha-" + r.pos + ".webp";
+        med.alt = "";
+        med.width = 112;
+        med.height = 112;
+        li.append(med);
+      }
+      if (r.nome) temNome = true;
+      var nome = el("span", "top-nome", r.nome || "Vaga aberta");
+      if (!r.nome) nome.classList.add("vago");
+      if (r.pos >= 1 && r.pos <= 3) {
+        var info = el("span", "top-info");
+        var pr = premios[r.pos - 1];
+        info.append(nome, el("span", "top-premio", pr.premio));
+        if (pr.minimo)
+          info.append(el("small", "top-min", textoMinimo(pr.minimo)));
+        li.append(info);
+      } else {
+        li.append(nome);
+      }
       ol.append(li);
     });
-    $("top-vazio").hidden = itens.length > 0;
+    $("top-vazio").hidden = temNome;
   }
 
   /* ---------- Participantes ---------- */
@@ -114,8 +234,10 @@
     );
   }
 
-  function renderLista() {
+  // modo: "cascata" (primeira vez / ver todos), "rapido" (busca) ou nada (atualização)
+  function renderLista(modo) {
     if (!dados) return;
+    if (typeof modo !== "string") modo = "";
     var termo = semAcento($("busca-campo").value);
     var soNumero = /^\d+$/.test(termo) ? Number(termo) : null;
     var vencedorNome =
@@ -145,18 +267,53 @@
 
     var ul = $("lista");
     var frag = document.createDocumentFragment();
-    visiveis.forEach(function (p) {
+    visiveis.forEach(function (p, i) {
       var li = el("li", "pessoa");
       if (vencedorNome && semAcento(p.nome) === vencedorNome)
         li.classList.add("vencedora");
-      li.append(el("span", "pessoa-nome", p.nome || "—"));
+      if (modo === "cascata" && i >= inicioCascata) {
+        li.classList.add("entra");
+        li.style.setProperty("--i", Math.min(i - inicioCascata, 12));
+      } else if (modo === "rapido") {
+        li.classList.add("entra-rapido");
+      }
+      var quem = el("span", "pessoa-quem");
+      quem.append(el("span", "pessoa-nome", p.nome || "—"));
+      if (p.apoiador === true) {
+        // selo brilhante de quem apoiou a live (campo opcional do JSON)
+        var selo = el("span", "selo-apoiador");
+        var presente = el("img");
+        presente.src = "assets/ico-presente.webp";
+        presente.alt = "";
+        presente.width = 16;
+        presente.height = 16;
+        selo.append(
+          el("span", "selo-brilho"),
+          presente,
+          el("span", null, "Apoiador"),
+        );
+        quem.append(selo);
+      }
+      if (p.completo === true) {
+        // fez os 3 jeitos e dobrou os números (campo opcional do JSON)
+        var completo = el("span", "selo-completo", "Completo");
+        completo.title = "Fez os 3 jeitos e dobrou os números";
+        quem.append(completo);
+      }
+      li.append(quem);
       var chave = String(p.plataforma || "").toLowerCase();
-      var plat = el(
-        "span",
-        "pessoa-plat",
-        PLATAFORMAS[chave] || p.plataforma || "",
-      );
+      var plat = el("span", "pessoa-plat");
       plat.dataset.plat = chave;
+      if (ICONES[chave]) {
+        // ícone oficial da rede
+        var ico = el("img", ICONES[chave].branco ? "branco" : "");
+        ico.src = ICONES[chave].src;
+        ico.alt = "";
+        ico.width = 14;
+        ico.height = 14;
+        plat.append(ico);
+      }
+      plat.append(PLATAFORMAS[chave] || p.plataforma || "");
       li.append(plat);
 
       var nums = el("ul", "nums");
@@ -170,6 +327,10 @@
         nums.append(chip);
       });
       li.append(nums);
+      // quantos números vieram de presente (campo opcional "pagos"): texto discreto
+      var pagos = Math.floor(Number(p.pagos));
+      if (isFinite(pagos) && pagos > 0)
+        li.append(el("span", "pessoa-pagos", "+" + pagos + " por presente"));
       frag.append(li);
     });
     ul.replaceChildren(frag);
@@ -319,12 +480,15 @@
   }
 
   function render(d) {
+    var primeira = !dados; // só a primeira carga tem animação de entrada nas listas
     dados = d;
     renderTopo(d);
-    renderMeta(d);
-    renderTop(d);
+    renderMeta(d, primeira);
+    renderTop(d, primeira);
+    renderRegTop(d);
     renderResumo(d);
-    renderLista();
+    inicioCascata = 0;
+    renderLista(primeira ? "cascata" : "");
     renderResultado(d);
     renderAtualizado(d);
   }
@@ -339,10 +503,15 @@
     return fetch(ARQUIVO + "?t=" + Date.now(), { cache: "no-store" })
       .then(function (r) {
         if (!r.ok) throw new Error("HTTP " + r.status);
-        return r.json();
+        return r.text();
       })
-      .then(function (d) {
-        render(d);
+      .then(function (texto) {
+        // nada mudou desde o último minuto: não mexe na tela
+        if (texto !== ultimoTexto) {
+          var d = JSON.parse(texto);
+          render(d);
+          ultimoTexto = texto;
+        }
         carregouUmaVez = true;
         avisar("");
       })
@@ -358,11 +527,66 @@
       });
   }
 
-  $("busca-campo").addEventListener("input", renderLista);
+  /* ---------- Movimento: painéis aparecem ao rolar ---------- */
+  function ligarRevelar() {
+    var alvos = document.querySelectorAll(".revela");
+    if (!("IntersectionObserver" in window)) {
+      alvos.forEach(function (a) {
+        a.classList.add("visto");
+      });
+      return;
+    }
+    var io = new IntersectionObserver(
+      function (entradas) {
+        entradas.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add("visto");
+            io.unobserve(e.target); // aparece uma vez só
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: "0px 0px -6% 0px" },
+    );
+    alvos.forEach(function (a) {
+      io.observe(a);
+    });
+  }
+
+  /* ---------- Movimento: capa do topo anda mais devagar que a página ---------- */
+  function ligarParallax() {
+    var par = $("capa-par");
+    var topo = document.querySelector(".topo");
+    if (!par || !topo || reduzido) return;
+    var pedido = false;
+    function mover() {
+      pedido = false;
+      var y = window.scrollY;
+      if (y > topo.offsetHeight) return;
+      par.style.transform = "translate3d(0," + Math.round(y * 0.3) + "px,0)";
+    }
+    window.addEventListener(
+      "scroll",
+      function () {
+        if (!pedido) {
+          pedido = true;
+          requestAnimationFrame(mover);
+        }
+      },
+      { passive: true },
+    );
+  }
+
+  ligarRevelar();
+  ligarParallax();
+
+  $("busca-campo").addEventListener("input", function () {
+    renderLista("rapido");
+  });
   $("ver-todos").addEventListener("click", function () {
     mostrarTodos = true;
     var primeiroNovo = LIMITE;
-    renderLista();
+    inicioCascata = LIMITE;
+    renderLista("cascata");
     var alvo = $("lista").children[primeiroNovo];
     if (alvo) {
       alvo.setAttribute("tabindex", "-1");

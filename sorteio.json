@@ -1,7 +1,24 @@
 {
-  "atualizado": "2026-11-18T20:45:01Z",
-  "ciclo": {"inicio":"2026-11-19","fim":"2026-12-31","premio":"GTA 6 lacrado (PS5)","premioReserva":"Gift card R$ 100"},
-  "meta": {"pct": 0},
+  "atualizado": "2026-11-19T00:51:10Z",
+  "ciclo": {
+    "inicio": "2026-11-19",
+    "fim": "2026-12-31",
+    "premio": "GTA 6 lacrado (PS5)",
+    "premioReserva": "Gift card R$ 100",
+    "premiosTop": [
+      "Gift card R$ 100 + pacote Lenda",
+      "Cargo VIP no Discord + destaque na live",
+      "Cargo VIP no Discord + destaque na live"
+    ],
+    "minimoTop": [
+      5000,
+      0,
+      0
+    ]
+  },
+  "meta": {
+    "pct": 0
+  },
   "totalNumeros": 0,
   "participantes": [],
   "ranking": [],
